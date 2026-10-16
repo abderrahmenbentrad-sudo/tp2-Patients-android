@@ -2,6 +2,7 @@ package com.example.patients.data.repository
 
 import com.example.patients.data.model.ApiError
 import com.example.patients.data.model.Consultation
+import com.example.patients.data.model.ConsultationRequest
 import com.example.patients.data.model.Patient
 import com.example.patients.data.model.PatientRequest
 import com.example.patients.data.remote.PatientApi
@@ -70,7 +71,11 @@ class PatientRepository(
         Unit
     }
 
-    suspend fun getConsultations(patientId: String): Result<List<Consultation>> = safeCall {
+    suspend fun getConsultations(patientId: String? = null): Result<List<Consultation>> = safeCall {
         api.getConsultations(patientId)
+    }
+
+    suspend fun createConsultation(request: ConsultationRequest): Result<Consultation> = safeCall {
+        api.createConsultation(request)
     }
 }

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.patients.PatientsApplication
+import com.example.patients.data.model.ConsultationRequest
 import com.example.patients.data.model.Patient
 import com.example.patients.data.model.PatientRequest
 import com.example.patients.data.repository.PatientRepository
@@ -20,7 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class PatientViewModel(
-    private val repository: PatientRepository
+    val repository: PatientRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<PatientsUiState>(PatientsUiState.Loading)
@@ -81,6 +82,18 @@ class PatientViewModel(
                 }
                 .onFailure { e ->
                     _messages.emit(e.message ?: "Ajout impossible")
+                }
+        }
+    }
+
+    fun createConsultation(request: ConsultationRequest) {
+        viewModelScope.launch {
+            repository.createConsultation(request)
+                .onSuccess {
+                    _messages.emit("Consultation ajoutée avec succès")
+                }
+                .onFailure { e ->
+                    _messages.emit(e.message ?: "Échec de l'ajout de la consultation")
                 }
         }
     }

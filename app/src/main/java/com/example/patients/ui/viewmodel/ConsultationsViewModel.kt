@@ -5,19 +5,26 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.patients.data.model.ConsultationRequest
 import com.example.patients.data.repository.PatientRepository
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ConsultationsViewModel(
-    private val patientId: String,
+    private val patientId: String?,
     private val repository: PatientRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<ConsultationsUiState>(ConsultationsUiState.Loading)
     val uiState: StateFlow<ConsultationsUiState> = _uiState.asStateFlow()
+
+    private val _messages = MutableSharedFlow<String>()
+    val messages: SharedFlow<String> = _messages.asSharedFlow()
 
     init {
         loadConsultations()
@@ -36,9 +43,22 @@ class ConsultationsViewModel(
         }
     }
 
+    fun createConsultation(request: ConsultationRequest) {
+        viewModelScope.launch {
+            repository.createConsultation(request)
+                .onSuccess {
+                    loadConsultations()
+                    _messages.emit("Consultation ajoutée avec succès")
+                }
+                .onFailure { e ->
+                    _messages.emit(e.message ?: "Échec de l'ajout de la consultation")
+                }
+        }
+    }
+
     companion object {
         fun provideFactory(
-            patientId: String,
+            patientId: String?,
             repository: PatientRepository
         ): ViewModelProvider.Factory = viewModelFactory {
             initializer {

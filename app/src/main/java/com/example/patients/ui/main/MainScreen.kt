@@ -11,6 +11,7 @@ import com.example.patients.ui.navigation.Screen
 import com.example.patients.ui.patients.PatientsScreen
 import com.example.patients.ui.patients.PatientViewModel
 import com.example.patients.ui.settings.SettingsScreen
+import com.example.patients.ui.viewmodel.ConsultationsScreen
 
 @Composable
 fun MainScreen() {
@@ -21,6 +22,7 @@ fun MainScreen() {
     val items = listOf(
         Screen.Home,
         Screen.Patients,
+        Screen.Consultations,
         Screen.Settings
     )
 
@@ -49,6 +51,7 @@ fun MainScreen() {
                 Screen.Home.route -> HomeScreen(
                     viewModel = viewModel,
                     onNavigateToPatients = { currentRoute = Screen.Patients.route },
+                    onNavigateToConsultations = { currentRoute = Screen.Consultations.route },
                     onAddPatient = {
                         openAddDialogOnPatients = true
                         currentRoute = Screen.Patients.route
@@ -59,10 +62,14 @@ fun MainScreen() {
                     openDialogOnStart = openAddDialogOnPatients,
                     onDialogOpened = { openAddDialogOnPatients = false }
                 )
+                Screen.Consultations.route -> ConsultationsScreen(
+                    repository = viewModel.repository
+                )
                 Screen.Settings.route -> SettingsScreen()
                 else -> HomeScreen(
                     viewModel = viewModel,
                     onNavigateToPatients = { currentRoute = Screen.Patients.route },
+                    onNavigateToConsultations = { currentRoute = Screen.Consultations.route },
                     onAddPatient = {
                         openAddDialogOnPatients = true
                         currentRoute = Screen.Patients.route
